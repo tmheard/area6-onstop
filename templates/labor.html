@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<h5 class="mb-2">Labor Details</h5>
+<div class="card mb-3 shadow-sm"><div class="card-body">
+  <form class="row g-2" method="post" action="{{ url_for('labor_new') }}">
+    <div class="col-md-3">
+      <label class="form-label">Store</label>
+      <select name="store_id" class="form-select" id="storeSelect">{% for s in stores %}<option value="{{s.id}}">{{s.number}} - {{s.name}}</option>{% endfor %}</select>
+      <div class="form-text">Authorized Hours: <strong id="authHours">—</strong></div>
+      <div class="small">Status: <strong id="liveStatus">—</strong></div>
+    </div>
+    <div class="col-md-2"><label class="form-label">Date</label><input name="report_date" type="date" class="form-control" value="{{ date.today() }}"></div>
+    <div class="col-md-2"><label class="form-label">Total Labor Used</label><input name="total_labor_used" id="totalLabor" type="number" step="0.01" class="form-control"></div>
+    <div class="col-md-2"><label class="form-label">Reg Labor Used</label><input name="reg_labor_used" type="number" step="0.01" class="form-control"></div>
+    <div class="col-md-1"><label class="form-label">OT</label><input name="overtime" id="overtime" type="number" step="0.01" class="form-control"><div class="form-text text-danger d-none" id="otAlert">Overtime > 24 — explain in Details (required)</div></div>
+    <div class="col-md-2"><label class="form-label">1081 (incl. training)</label><input name="code_1081_training" type="number" step="0.01" class="form-control"></div>
+    <div class="col-12"><label class="form-label">Details</label><textarea name="details" id="details" class="form-control" rows="2" placeholder="Notes/details for labor"></textarea></div>
+    <div class="col-12 d-grid mt-2"><button class="btn btn-primary">Save Labor</button></div>
+  </form>
+</div></div>
+
+<div class="card shadow-sm"><div class="card-body">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Store</th><th>Date</th><th>Authorized</th><th>Total</th><th>Diff</th><th>Status</th><th>OT</th><th>1081</th><th>Details</th></tr></thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        <td>{{ row.rec.store.number }} - {{ row.rec.store.name }}</td>
+        <td>{{ row.rec.report_date }}</td>
+        <td>{{ row.authorized if row.authorized is not none else '—' }}</td>
+        <td>{{ row.rec.total_labor_used or 0 }}</td>
+        <td>{% if row.diff is none %}—{% else %}{{ row.diff }}{% if row.diff>0 %} (over){% elif row.diff<0 %} (under){% endif %}{% endif %}</td>
+        <td>{% if row.status == 'Over' %}<span class="badge text-bg-danger">Over</span>{% elif row.status == 'Under' %}<span class="badge text-bg-warning">Under</span>{% elif row.status == 'At' %}<span class="badge text-bg-success">At</span>{% else %}—{% endif %}</td>
+        <td>{{ row.rec.overtime or 0 }}{% if row.ot_flag %}<span class="badge text-bg-danger ms-1">OT > 24</span>{% endif %}</td>
+        <td>{{ row.rec.code_1081_training or 0 }}</td>
+        <td style="max-width: 320px; white-space: pre-wrap;">{{ row.rec.details or '' }}</td>
+      </tr>
+      {% else %}<tr><td colspan="9" class="text-muted">No labor entries yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+
+<script>
+(function () {
+  const HOURS_BY_ID = {{ hours_by_id|tojson }};
+  const storeSel = document.getElementById('storeSelect');
+  const authEl = document.getElementById('authHours');
+  const statusEl = document.getElementById('liveStatus');
+  const totalEl = document.getElementById('totalLabor');
+  const otEl = document.getElementById('overtime');
+  const otAlert = document.getElementById('otAlert');
+  const details = document.getElementById('details');
+
+  function updateAuth() {
+    const auth = HOURS_BY_ID[storeSel.value];
+    authEl.textContent = (auth != null) ? (auth + ' hours') : '—';
+    updateStatus();
+  }
+  function updateStatus() {
+    const auth = HOURS_BY_ID[storeSel.value];
+    const total = parseFloat(totalEl.value || '0');
+    if (auth == null || !totalEl.value) { statusEl.textContent = '—'; return; }
+    const diff = +(total - auth).toFixed(2);
+    if (diff > 0) statusEl.textContent = `Over by ${diff}`;
+    else if (diff < 0) statusEl.textContent = `Under by ${Math.abs(diff)}`;
+    else statusEl.textContent = 'At authorized';
+  }
+  function checkOT() {
+    const ot = parseFloat(otEl.value || '0');
+    const over = ot > 24;
+    otAlert.classList.toggle('d-none', !over);
+    details.required = over;
+  }
+  storeSel.addEventListener('change', updateAuth);
+  totalEl.addEventListener('input', updateStatus);
+  otEl.addEventListener('input', checkOT);
+  updateAuth(); checkOT();
+})();
+</script>
+{% endblock %}

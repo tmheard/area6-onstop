@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Area 6 OnStop</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark rt-header shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="{{ url_for('index') }}">
+      <img src="{{ url_for('static', filename='racetrac_logo.png') }}" alt="RaceTrac" height="28" class="me-2">
+      <span>Area 6 OnStop</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('closures') }}">Closures</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('closures') }}">Labor</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('tickets') }}">Service Tickets</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('walks') }}">Food Safety</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('news') }}">News</a></li>
+      </ul>
+      {% if current_user.is_authenticated %}
+      <div class="d-flex"><a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">Logout</a></div>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="container py-3">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{cat}} alert-dismissible fade show" role="alert">
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

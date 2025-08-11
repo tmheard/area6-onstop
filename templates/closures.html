@@ -1,0 +1,31 @@
+from datetime import date
+
+@app.route('/closures', methods=['GET', 'POST'])
+@login_required
+def closures():
+    if request.method == 'POST':
+        store = request.form['store']
+        closure_date = request.form['closure_date']
+        time_closed = request.form['time_closed']
+        time_opened = request.form['time_opened']
+        reason = request.form['reason']
+
+        conn = get_db_connection()
+        conn.execute(
+            "INSERT INTO closures (store, closure_date, time_closed, time_opened, reason) VALUES (?, ?, ?, ?, ?)",
+            (store, closure_date, time_closed, time_opened, reason)
+        )
+        conn.commit()
+        conn.close()
+
+    conn = get_db_connection()
+    data = conn.execute("SELECT * FROM closures").fetchall()
+    conn.close()
+
+    stores = [
+        "RT 185 - Picayune", "RT 266 - Fremaux", "RT 292 - Covington",
+        "RT 380 - Slidell", "RT 573 - Gause", "RT 673 - Harrison",
+        "RT 2372 - Hwy 11", "RT 2483 - Lorraine", "RT 2497 - Washington",
+        "RT 2579 - Mandeville"
+    ]
+    return render_template("closures.html", data=data, stores=stores, today=date.today().isoformat())

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4 class="mb-3">Dashboard</h4>
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100"><div class="card-header"><strong>Recent Closures</strong></div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% for c in closures %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              <span>{{ c.closure_date }} — {{ c.store.number }} - {{ c.store.name }}</span>
+              <span class="badge text-bg-secondary">{{ c.reason }}</span>
+            </li>
+          {% else %}<li class="list-group-item text-muted">No closures yet.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm h-100"><div class="card-header"><strong>Recent Labor</strong></div>
+      <div class="card-body">
+        <ul class="list-group list-group-flush">
+          {% for l in labor %}
+            <li class="list-group-item">{{ l.report_date }} — {{ l.store.number }} - {{ l.store.name }} — Total {{ l.total_labor_used or 0 }}</li>
+          {% else %}<li class="list-group-item text-muted">No labor entries yet.</li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

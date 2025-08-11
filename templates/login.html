@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-5">
+    <div class="card shadow-sm"><div class="card-body">
+      <div class="text-center mb-3"><img src="{{ url_for('static', filename='racetrac_logo.png') }}" alt="RaceTrac" height="40"></div>
+      <h5 class="mb-3 text-center">Sign in</h5>
+      <form method="post" action="{{ url_for('login') }}">
+        <div class="mb-3"><label class="form-label">Email</label><input name="email" type="email" class="form-control" required></div>
+        <div class="mb-3"><label class="form-label">Password</label><input name="password" type="password" class="form-control" required></div>
+        <div class="d-grid"><button class="btn btn-primary">Login</button></div>
+      </form>
+      <div class="mt-3 small text-muted text-center">Default admin: admin@example.com / admin123</div>
+    </div></div>
+  </div>
+</div>
+{% endblock %}

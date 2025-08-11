@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+<h5 class="mb-2">Past-Due Service Tickets</h5>
+<div class="card mb-3 shadow-sm"><div class="card-body">
+  <form class="row g-2" method="post" action="{{ url_for('tickets_new') }}">
+    <div class="col-md-3"><label class="form-label">Store *</label>
+      <select name="store_id" class="form-select" required>
+        <option value="" disabled selected>Select Store</option>
+        {% for s in stores %}<option value="{{ s.id }}">{{ s.number }} - {{ s.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><label class="form-label">Ticket # *</label><input name="ticket_number" class="form-control" required></div>
+    <div class="col-md-3"><label class="form-label">Equipment Down *</label><input name="equipment_down" class="form-control" required></div>
+    <div class="col-md-2"><label class="form-label">Scheduled Date *</label><input name="scheduled_date" type="date" class="form-control" required value="{{ date.today() }}"></div>
+    <div class="col-md-2 d-flex align-items-end">
+      <div class="form-check me-3"><input class="form-check-input" type="checkbox" name="parts_on_order" id="partsCheck"><label class="form-check-label" for="partsCheck">Parts on order</label></div>
+      <div class="form-check"><input class="form-check-input" type="checkbox" name="repeat_issue" id="repeatCheck"><label class="form-check-label" for="repeatCheck">Repeat issue</label></div>
+    </div>
+    <div class="col-12"><label class="form-label">Last Note</label><textarea name="last_note" class="form-control" rows="2" placeholder="Add the latest note on this ticket"></textarea></div>
+    <div class="col-12 d-grid mt-2"><button class="btn btn-primary">Save Ticket</button></div>
+  </form>
+</div></div>
+<div class="card shadow-sm"><div class="card-body">
+  <table class="table table-sm align-middle">
+    <thead><tr><th>Store</th><th>Ticket #</th><th>Equipment</th><th>Scheduled</th><th>Days Past Due</th><th>Parts on Order</th><th>Repeat Issue</th><th>Last Note</th></tr></thead>
+    <tbody>
+      {% for row in rows %}{% set t = row.rec %}
+      <tr class="{% if row.days_past_due > 0 %}table-danger{% endif %}">
+        <td>{{ t.store.number ~ ' - ' ~ t.store.name }}</td>
+        <td>{{ t.ticket_number }}</td><td>{{ t.equipment_down }}</td><td>{{ t.scheduled_date }}</td>
+        <td>{% if row.days_past_due > 0 %}<strong>{{ row.days_past_due }}</strong>{% else %}0{% endif %}</td>
+        <td>{% if t.parts_on_order %}<span class="badge text-bg-warning">Yes</span>{% else %}<span class="badge text-bg-secondary">No</span>{% endif %}</td>
+        <td>{% if t.repeat_issue %}<span class="badge text-bg-danger">Yes</span>{% else %}<span class="badge text-bg-secondary">No</span>{% endif %}</td>
+        <td style="max-width: 320px; white-space: pre-wrap;">{{ t.last_note or '' }}</td>
+      </tr>
+      {% else %}<tr><td colspan="8" class="text-muted">No tickets yet.</td></tr>{% endfor %}
+    </tbody>
+  </table>
+</div></div>
+{% endblock %}

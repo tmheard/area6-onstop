@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<h5 class="mb-3">Walk Details</h5>
+<div class="card"><div class="card-body">
+  <div class="mb-2"><strong>Store:</strong> {{ rec.store.number }} - {{ rec.store.name }}</div>
+  <div class="mb-2"><strong>Date:</strong> {{ rec.walk_date }}</div><hr>
+  {% for cat, block in responses.items() %}
+    <div class="mb-3">
+      <h6>{{ cat }}</h6>
+      {% if block.checked and block.checked|length %}<ul>{% for item in block.checked %}<li>{{ item }}</li>{% endfor %}</ul>
+      {% else %}<div class="text-muted">No items checked.</div>{% endif %}
+      {% if block.notes %}<div><strong>Notes:</strong> {{ block.notes }}</div>{% endif %}
+    </div>
+  {% endfor %}
+</div></div>
+{% endblock %}
